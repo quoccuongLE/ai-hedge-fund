@@ -46,3 +46,8 @@ Thumbs.db
 
 # Txt files
 *.txt
+
+.venv/
+tmp/
+.vscode/
+.venv
