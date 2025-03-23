@@ -20,6 +20,7 @@ from data.models import (
 _cache = get_cache()
 
 
+# TODO:
 def get_prices(ticker: str, start_date: str, end_date: str) -> list[Price]:
     """Fetch price data from cache or API."""
     # Check cache first
@@ -51,6 +52,7 @@ def get_prices(ticker: str, start_date: str, end_date: str) -> list[Price]:
     return prices
 
 
+# TODO: OK
 def get_financial_metrics(
     ticker: str,
     end_date: str,
@@ -89,6 +91,7 @@ def get_financial_metrics(
     return financial_metrics
 
 
+# TODO
 def search_line_items(
     ticker: str,
     line_items: list[str],
@@ -124,6 +127,7 @@ def search_line_items(
     return search_results[:limit]
 
 
+# TODO
 def get_insider_trades(
     ticker: str,
     end_date: str,
@@ -187,6 +191,7 @@ def get_insider_trades(
     return all_trades
 
 
+# TODO
 def get_company_news(
     ticker: str,
     end_date: str,

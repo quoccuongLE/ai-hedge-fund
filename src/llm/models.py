@@ -4,6 +4,7 @@ from langchain_deepseek import ChatDeepSeek
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_groq import ChatGroq
 from langchain_openai import ChatOpenAI
+from langchain_ollama import ChatOllama
 from enum import Enum
 from pydantic import BaseModel
 from typing import Tuple
@@ -16,7 +17,7 @@ class ModelProvider(str, Enum):
     GEMINI = "Gemini"
     GROQ = "Groq"
     OPENAI = "OpenAI"
-
+    OLLAMA = "Ollama"
 
 
 class LLMModel(BaseModel):
@@ -44,66 +45,20 @@ class LLMModel(BaseModel):
 
 # Define available models
 AVAILABLE_MODELS = [
-    LLMModel(
-        display_name="[anthropic] claude-3.5-haiku",
-        model_name="claude-3-5-haiku-latest",
-        provider=ModelProvider.ANTHROPIC
-    ),
-    LLMModel(
-        display_name="[anthropic] claude-3.5-sonnet",
-        model_name="claude-3-5-sonnet-latest",
-        provider=ModelProvider.ANTHROPIC
-    ),
-    LLMModel(
-        display_name="[anthropic] claude-3.7-sonnet",
-        model_name="claude-3-7-sonnet-latest",
-        provider=ModelProvider.ANTHROPIC
-    ),
-    LLMModel(
-        display_name="[deepseek] deepseek-r1",
-        model_name="deepseek-reasoner",
-        provider=ModelProvider.DEEPSEEK
-    ),
-    LLMModel(
-        display_name="[deepseek] deepseek-v3",
-        model_name="deepseek-chat",
-        provider=ModelProvider.DEEPSEEK
-    ),
-    LLMModel(
-        display_name="[gemini] gemini-2.0-flash",
-        model_name="gemini-2.0-flash",
-        provider=ModelProvider.GEMINI
-    ),
-    LLMModel(
-        display_name="[gemini] gemini-2.0-pro",
-        model_name="gemini-2.0-pro-exp-02-05",
-        provider=ModelProvider.GEMINI
-    ),
-    LLMModel(
-        display_name="[groq] llama-3.3 70b",
-        model_name="llama-3.3-70b-versatile",
-        provider=ModelProvider.GROQ
-    ),
-    LLMModel(
-        display_name="[openai] gpt-4.5",
-        model_name="gpt-4.5-preview",
-        provider=ModelProvider.OPENAI
-    ),
-    LLMModel(
-        display_name="[openai] gpt-4o",
-        model_name="gpt-4o",
-        provider=ModelProvider.OPENAI
-    ),
-    LLMModel(
-        display_name="[openai] o1",
-        model_name="o1",
-        provider=ModelProvider.OPENAI
-    ),
-    LLMModel(
-        display_name="[openai] o3-mini",
-        model_name="o3-mini",
-        provider=ModelProvider.OPENAI
-    ),
+    LLMModel(display_name="[anthropic] claude-3.5-haiku", model_name="claude-3-5-haiku-latest", provider=ModelProvider.ANTHROPIC),
+    LLMModel(display_name="[anthropic] claude-3.5-sonnet", model_name="claude-3-5-sonnet-latest", provider=ModelProvider.ANTHROPIC),
+    LLMModel(display_name="[anthropic] claude-3.7-sonnet", model_name="claude-3-7-sonnet-latest", provider=ModelProvider.ANTHROPIC),
+    LLMModel(display_name="[deepseek] deepseek-r1", model_name="deepseek-reasoner", provider=ModelProvider.DEEPSEEK),
+    LLMModel(display_name="[deepseek] deepseek-v3", model_name="deepseek-chat", provider=ModelProvider.DEEPSEEK),
+    LLMModel(display_name="[gemini] gemini-2.0-flash", model_name="gemini-2.0-flash", provider=ModelProvider.GEMINI),
+    LLMModel(display_name="[gemini] gemini-2.0-pro", model_name="gemini-2.0-pro-exp-02-05", provider=ModelProvider.GEMINI),
+    LLMModel(display_name="[groq] llama-3.3 70b", model_name="llama-3.3-70b-versatile", provider=ModelProvider.GROQ),
+    LLMModel(display_name="[openai] gpt-4.5", model_name="gpt-4.5-preview", provider=ModelProvider.OPENAI),
+    LLMModel(display_name="[openai] gpt-4o", model_name="gpt-4o", provider=ModelProvider.OPENAI),
+    LLMModel(display_name="[openai] o1", model_name="o1", provider=ModelProvider.OPENAI),
+    LLMModel(display_name="[openai] o3-mini", model_name="o3-mini", provider=ModelProvider.OPENAI),
+    LLMModel(display_name="[ollama] llama3.1-8B", model_name="llama3.1:latest", provider=ModelProvider.OLLAMA),
+    LLMModel(display_name="[ollama] gemma3-12B", model_name="gemma3:12b", provider=ModelProvider.OLLAMA),
 ]
 
 # Create LLM_ORDER in the format expected by the UI
@@ -147,3 +102,10 @@ def get_model(model_name: str, model_provider: ModelProvider) -> ChatOpenAI | Ch
             print(f"API Key Error: Please make sure GOOGLE_API_KEY is set in your .env file.")
             raise ValueError("Google API key not found.  Please make sure GOOGLE_API_KEY is set in your .env file.")
         return ChatGoogleGenerativeAI(model=model_name, api_key=api_key)
+    elif model_provider == ModelProvider.OLLAMA:
+        host_url = os.getenv("OLLAMA_URL")
+        if not host_url:
+            ollama_host = os.environ.get("OLLAMA_HOST", "127.0.0.1")
+            ollama_port = os.environ.get("OLLAMA_PORT", "11434")
+            host_url = f"http://{ollama_host}:{ollama_port}"
+        return ChatOllama(name=model_name, host_url=host_url)
